@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus AR Admin - Buildings</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-brand"><i class="ti ti-map-pin"></i><span>Campus AR</span></div>
+      <div class="sidebar-sub">Admin console</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active" data-view="buildings"><i class="ti ti-building"></i>Buildings</button>
+      <button class="sidebar-link" id="change-password-btn"><i class="ti ti-lock"></i>Change password</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-link" id="logout-btn"><i class="ti ti-logout"></i>Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Buildings</h1>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" id="search-input" placeholder="Search buildings">
+        </div>
+        <button class="btn btn-primary" id="add-building-btn"><i class="ti ti-plus"></i>Add building</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">Buildings</div>
+        <div class="value" id="stat-total">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Facilities tagged</div>
+        <div class="value" id="stat-facilities">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Last updated</div>
+        <div class="value" id="stat-updated">-</div>
+      </div>
+    </div>
+
+    <div class="building-grid" id="building-grid">
+      <!-- building cards are rendered here by js/dashboard.js -->
+    </div>
+
+  </main>
+
+  <nav class="mobile-nav">
+    <button class="active"><i class="ti ti-building"></i></button>
+    <button id="mobile-password-btn"><i class="ti ti-lock"></i></button>
+    <button id="mobile-logout-btn"><i class="ti ti-logout"></i></button>
+  </nav>
+
+</div>
+
+<!-- Add / Edit drawer -->
+<div class="drawer-overlay hidden" id="form-drawer-overlay">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h2 id="form-drawer-title">Add building</h2>
+      <button class="drawer-close" id="form-drawer-close"><i class="ti ti-x"></i></button>
+    </div>
+    <form id="building-form" class="drawer-body" enctype="multipart/form-data">
+      <div id="form-error" class="form-error hidden"></div>
+
+      <input type="hidden" id="building-id" name="id">
+
+      <div class="field">
+        <label for="building-name">Building name</label>
+        <input type="text" id="building-name" name="name" required>
+      </div>
+
+      <div class="field">
+        <label for="building-description">Description</label>
+        <textarea id="building-description" name="description" rows="4"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="building-latitude">Latitude</label>
+          <input type="number" id="building-latitude" name="latitude" step="any" min="-90" max="90" placeholder="e.g. 10.6420">
+        </div>
+        <div class="field">
+          <label for="building-longitude">Longitude</label>
+          <input type="number" id="building-longitude" name="longitude" step="any" min="-180" max="180" placeholder="e.g. 122.2354">
+        </div>
+        <div class="field">
+          <label for="building-elevation">Elevation (m)</label>
+          <input type="number" id="building-elevation" name="elevation" step="any" placeholder="e.g. 12.5">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Building image</label>
+        <label class="image-drop" id="image-drop">
+          <img id="image-preview" class="hidden" alt="">
+          <span id="image-drop-label"><i class="ti ti-upload"></i> Click to upload an image</span>
+          <input type="file" id="image-input" name="image" accept="image/jpeg,image/png,image/webp">
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="facility-input">Facilities</label>
+        <div class="facility-input-row">
+          <input type="text" id="facility-input" placeholder="e.g. Wi-Fi, then press Enter">
+          <button type="button" class="btn btn-ghost" id="facility-add-btn"><i class="ti ti-plus"></i></button>
+        </div>
+        <div class="chip-row" id="facility-chip-row"></div>
+        <div class="facility-hint">Optional - add any facilities this building has.</div>
+        <input type="hidden" id="facilities-json" name="facilities" value="[]">
+      </div>
+    </form>
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-ghost" id="form-cancel-btn">Cancel</button>
+      <button type="submit" form="building-form" class="btn btn-primary" id="form-save-btn">Save building</button>
+    </div>
+  </div>
+</div>
+
+<!-- View drawer -->
+<div class="drawer-overlay hidden" id="view-drawer-overlay">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h2 id="view-drawer-title">Building details</h2>
+      <button class="drawer-close" id="view-drawer-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="drawer-body">
+      <img class="view-detail-image" id="view-image" alt="">
+      <p class="view-detail-desc" id="view-description"></p>
+      <div class="view-detail-coords" id="view-coords"></div>
+      <div class="chip-row" id="view-facilities"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirmation -->
+<div class="modal-overlay hidden" id="delete-modal-overlay">
+  <div class="modal-card">
+    <h3>Delete this building?</h3>
+    <p id="delete-modal-text">This removes it from the AR navigation app and can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="delete-cancel-btn">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change password -->
+<div class="modal-overlay hidden" id="password-modal-overlay">
+  <div class="modal-card">
+    <h3>Change password</h3>
+    <form id="password-form" style="display:flex;flex-direction:column;gap:14px;">
+      <div id="password-error" class="form-error hidden"></div>
+      <div class="field">
+        <label for="current-password">Current password</label>
+        <input type="password" id="current-password" autocomplete="current-password" required>
+      </div>
+      <div class="field">
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" autocomplete="new-password" minlength="6" required>
+      </div>
+      <div class="field">
+        <label for="confirm-password">Confirm new password</label>
+        <input type="password" id="confirm-password" autocomplete="new-password" minlength="6" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="password-cancel-btn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="password-save-btn">Update password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

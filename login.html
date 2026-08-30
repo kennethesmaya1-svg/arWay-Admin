@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus AR Admin - Sign in</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-brand">
+      <div class="pin-mark"><i class="ti ti-map-pin"></i></div>
+      <span class="login-kicker">Campus navigation platform</span>
+      <h1>Campus AR admin</h1>
+      <p>Manage the buildings, descriptions, images, and facilities that power the campus AR navigation app.</p>
+      <div class="login-brand-meta"><i class="ti ti-shield-check"></i> Secure administrator access</div>
+    </div>
+
+    <div class="login-form-side">
+      <div class="login-form-heading">
+        <span class="login-eyebrow">Welcome back</span>
+        <h2>Sign in to your account</h2>
+        <p>Enter your administrator credentials to continue.</p>
+      </div>
+      <div id="login-error" class="form-error hidden"></div>
+
+      <form id="login-form">
+        <div class="field login-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email" required>
+        </div>
+        <div class="field login-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary login-submit" id="login-submit">Sign in</button>
+      </form>
+      <p class="login-form-footer">Only authorized campus administrators may access this area.</p>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="js/login.js"></script>
+</body>
+</html>
