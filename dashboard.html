@@ -13,7 +13,7 @@
 
   <aside class="sidebar">
     <div>
-      <div class="sidebar-brand"><i class="ti ti-map-pin"></i><span>Campus AR</span></div>
+      <div class="sidebar-brand"><i class="ti ti-map-pin"></i><span>Campus AR Navigation</span></div>
       <div class="sidebar-sub">Admin console</div>
     </div>
     <nav class="sidebar-nav">
@@ -85,23 +85,49 @@
       </div>
 
       <div class="field">
-        <label for="building-description">Description</label>
-        <textarea id="building-description" name="description" rows="4"></textarea>
+        <label for="building-node-id">Building node ID</label>
+        <select id="building-node-id" name="building_node_id">
+          <option value="">Select a building node</option>
+          <option value="Node-01">Node-01(poi)</option>
+          <option value="Node-02">Node-02(poi)</option>
+          <option value="Node-03">Node-03(poi)</option>
+          <option value="Node-04">Node-04(poi)</option>
+          <option value="Node-05">Node-05(poi)</option>
+          <option value="Node-06">Node-06(poi)</option>
+          <option value="Node-07">Node-07(poi)</option>
+          <option value="Node-08">Node-08(poi)</option>
+          <option value="Node-09">Node-09(poi)</option>
+          <option value="Node-10">Node-10(poi)</option>
+          <option value="Node-11">Node-11(poi)</option>
+          <option value="Node-12">Node-12(poi)</option>
+          <option value="Node-13">Node-13(poi)</option>
+          <option value="Node-14">Node-14(waypoint)</option>
+          <option value="Node-15">Node-15(poi)</option>
+          <option value="Node-16">Node-16(poi)</option>
+          <option value="Node-17">Node-17(poi)</option>
+          <option value="Node-18">Node-18(waypoint)</option>
+          <option value="Node-19">Node-19(poi)</option>
+          <option value="Node-20">Node-20(waypoint)</option>
+          <option value="Node-21">Node-21(poi)</option>
+          <option value="Node-22">Node-22(poi)</option>
+          <option value="Node-23">Node-23(poi)</option>
+          <option value="Node-24">Node-24(poi)</option>
+          <option value="Node-25">Node-25(waypoint)</option>
+          <option value="Node-26">Node-26(poi)</option>
+          <option value="Node-27">Node-27(waypoint)</option>
+          <option value="Node-28">Node-28(waypoint)</option>
+          <option value="Node-29">Node-29(poi)</option>
+          <option value="Node-30">Node-30(poi)</option>
+          <option value="Node-31">Node-31(poi)</option>
+          <option value="Node-32">Node-32(poi)</option>
+          <option value="Node-33">Node-33(waypoint)</option>
+          <option value="Node-34">Node-34(waypoint)</option>
+        </select>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="building-latitude">Latitude</label>
-          <input type="number" id="building-latitude" name="latitude" step="any" min="-90" max="90" placeholder="e.g. 10.6420">
-        </div>
-        <div class="field">
-          <label for="building-longitude">Longitude</label>
-          <input type="number" id="building-longitude" name="longitude" step="any" min="-180" max="180" placeholder="e.g. 122.2354">
-        </div>
-        <div class="field">
-          <label for="building-elevation">Elevation (m)</label>
-          <input type="number" id="building-elevation" name="elevation" step="any" placeholder="e.g. 12.5">
-        </div>
+      <div class="field">
+        <label for="building-description">Description</label>
+        <textarea id="building-description" name="description" rows="4"></textarea>
       </div>
 
       <div class="field">
@@ -141,7 +167,6 @@
     <div class="drawer-body">
       <img class="view-detail-image" id="view-image" alt="">
       <p class="view-detail-desc" id="view-description"></p>
-      <div class="view-detail-coords" id="view-coords"></div>
       <div class="chip-row" id="view-facilities"></div>
     </div>
   </div>
@@ -167,15 +192,24 @@
       <div id="password-error" class="form-error hidden"></div>
       <div class="field">
         <label for="current-password">Current password</label>
-        <input type="password" id="current-password" autocomplete="current-password" required>
+        <div class="password-input-wrap">
+          <input type="password" id="current-password" autocomplete="current-password" required>
+          <button type="button" class="password-toggle" data-password-target="current-password" aria-label="Show current password" title="Show password"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <div class="field">
         <label for="new-password">New password</label>
-        <input type="password" id="new-password" autocomplete="new-password" minlength="6" required>
+        <div class="password-input-wrap">
+          <input type="password" id="new-password" autocomplete="new-password" minlength="6" required>
+          <button type="button" class="password-toggle" data-password-target="new-password" aria-label="Show new password" title="Show password"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <div class="field">
         <label for="confirm-password">Confirm new password</label>
-        <input type="password" id="confirm-password" autocomplete="new-password" minlength="6" required>
+        <div class="password-input-wrap">
+          <input type="password" id="confirm-password" autocomplete="new-password" minlength="6" required>
+          <button type="button" class="password-toggle" data-password-target="confirm-password" aria-label="Show confirmed password" title="Show password"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="password-cancel-btn">Cancel</button>

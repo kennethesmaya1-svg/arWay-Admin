@@ -8,9 +8,12 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {
+  EmailAuthProvider,
   getAuth,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   signOut,
+  updatePassword,
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 import { app } from "../firebase-config.js";
 
@@ -53,11 +56,9 @@ function normalizeBuilding(id, data) {
   return {
     id,
     name: String(data.name || data.title || "Unnamed building"),
+    building_node_id: String(data.building_node_id || ""),
     description: String(data.description || ""),
       image: String(data.imageUrl || data.image || ""),
-    latitude: data.latitude ?? null,
-    longitude: data.longitude ?? null,
-    elevation: data.elevation ?? null,
     facilities,
     updatedAt: data.updatedAt || data.updated_at || data.createdAt || null,
   };
@@ -115,6 +116,13 @@ function bindEvents() {
   document.getElementById("building-form").addEventListener("submit", saveBuilding);
   document.getElementById("delete-cancel-btn").addEventListener("click", closeDeleteModal);
   document.getElementById("delete-confirm-btn").addEventListener("click", deleteBuilding);
+  document.getElementById("change-password-btn").addEventListener("click", openPasswordModal);
+  document.getElementById("mobile-password-btn").addEventListener("click", openPasswordModal);
+  document.getElementById("password-cancel-btn").addEventListener("click", closePasswordModal);
+  document.getElementById("password-form").addEventListener("submit", changePassword);
+  document.querySelectorAll(".password-toggle").forEach((button) => {
+    button.addEventListener("click", () => togglePasswordVisibility(button));
+  });
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("mobile-logout-btn").addEventListener("click", logout);
 }
@@ -124,10 +132,8 @@ function openFormDrawer(building) {
   document.getElementById("building-id").value = building ? building.id : "";
   document.getElementById("form-drawer-title").textContent = building ? "Edit building" : "Add building";
   document.getElementById("building-name").value = building?.name || "";
+  document.getElementById("building-node-id").value = building?.building_node_id || "";
   document.getElementById("building-description").value = building?.description || "";
-  document.getElementById("building-latitude").value = building?.latitude ?? "";
-  document.getElementById("building-longitude").value = building?.longitude ?? "";
-  document.getElementById("building-elevation").value = building?.elevation ?? "";
   facilityTags = [...(building?.facilities || [])];
   renderFacilities();
   const preview = document.getElementById("image-preview");
@@ -172,10 +178,8 @@ async function saveBuilding(event) {
     const id = document.getElementById("building-id").value;
     const data = {
       name: document.getElementById("building-name").value.trim(),
+      building_node_id: document.getElementById("building-node-id").value.trim(),
       description: document.getElementById("building-description").value.trim(),
-      latitude: numberOrNull("building-latitude"),
-      longitude: numberOrNull("building-longitude"),
-      elevation: numberOrNull("building-elevation"),
       facilities: facilityTags,
       updatedAt: serverTimestamp(),
     };
@@ -203,7 +207,6 @@ function openViewDrawer(building) {
   image.src = building.image || "";
   image.classList.toggle("hidden", !building.image);
   document.getElementById("view-description").textContent = building.description || "No description yet.";
-  document.getElementById("view-coords").textContent = [building.latitude != null && `Coordinates: ${building.latitude}, ${building.longitude}`, building.elevation != null && `Elevation: ${building.elevation} m`].filter(Boolean).join(" | ");
   document.getElementById("view-facilities").innerHTML = building.facilities.map((facility) => `<span class="chip">${escapeHtml(facility)}</span>`).join("");
   document.getElementById("view-drawer-overlay").classList.remove("hidden");
 }
@@ -220,8 +223,68 @@ async function deleteBuilding() {
   catch (error) { console.error("Error deleting building:", error); }
   closeDeleteModal();
 }
+function openPasswordModal() {
+  document.getElementById("password-form").reset();
+  document.getElementById("password-error").classList.add("hidden");
+  document.getElementById("password-modal-overlay").classList.remove("hidden");
+  document.getElementById("current-password").focus();
+}
+function closePasswordModal() {
+  document.getElementById("password-modal-overlay").classList.add("hidden");
+}
+function togglePasswordVisibility(button) {
+  const input = document.getElementById(button.dataset.passwordTarget);
+  const isVisible = input.type === "text";
+  input.type = isVisible ? "password" : "text";
+  button.setAttribute("aria-label", `${isVisible ? "Show" : "Hide"} password`);
+  button.title = `${isVisible ? "Show" : "Hide"} password`;
+  button.innerHTML = `<i class="ti ti-eye${isVisible ? "" : "-off"}"></i>`;
+}
+async function changePassword(event) {
+  event.preventDefault();
+  const user = auth.currentUser;
+  const currentPassword = document.getElementById("current-password").value;
+  const newPassword = document.getElementById("new-password").value;
+  const confirmPassword = document.getElementById("confirm-password").value;
+  const errorBox = document.getElementById("password-error");
+  const saveButton = document.getElementById("password-save-btn");
+
+  errorBox.classList.add("hidden");
+  if (newPassword !== confirmPassword) {
+    errorBox.textContent = "New passwords do not match.";
+    errorBox.classList.remove("hidden");
+    return;
+  }
+  if (!user?.email) {
+    errorBox.textContent = "Your account does not support password changes.";
+    errorBox.classList.remove("hidden");
+    return;
+  }
+
+  saveButton.disabled = true;
+  try {
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+    closePasswordModal();
+    showToast("Password updated successfully.");
+  } catch (error) {
+    console.error("Error changing password:", error);
+    errorBox.textContent = passwordErrorMessage(error);
+    errorBox.classList.remove("hidden");
+  } finally {
+    saveButton.disabled = false;
+  }
+}
+function passwordErrorMessage(error) {
+  if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
+    return "Current password is incorrect.";
+  }
+  if (error.code === "auth/weak-password") return "New password must be at least 6 characters.";
+  if (error.code === "auth/requires-recent-login") return "Please log in again before changing your password.";
+  return error.message || "Could not change your password.";
+}
 async function logout() { await signOut(auth); window.location.href = "login.html"; }
-function numberOrNull(id) { const value = document.getElementById(id).value; return value === "" ? null : Number(value); }
 async function uploadImageToCloudinary(file) {
   if (CLOUD_NAME === "your_actual_cloud_name" || UPLOAD_PRESET === "my_app_preset") {
     throw new Error("Configure Cloudinary CLOUD_NAME and UPLOAD_PRESET before uploading images.");
@@ -251,5 +314,12 @@ function buildingIdValue(id) {
 function dateValue(value) { return value?.toDate ? value.toDate().getTime() : value?.seconds ? value.seconds * 1000 : new Date(value || 0).getTime() || 0; }
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character])); }
 function escapeAttr(value) { return escapeHtml(value); }
+function showToast(message, isError = false) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.toggle("error", isError);
+  toast.classList.remove("hidden");
+  setTimeout(() => toast.classList.add("hidden"), 3000);
+}
 
 bindEvents();

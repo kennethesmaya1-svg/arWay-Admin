@@ -23,7 +23,7 @@
     <div class="login-form-side">
       <div class="login-form-heading">
         <span class="login-eyebrow">Welcome back</span>
-        <h2>Sign in to your account</h2>
+        <h2>Login to your account</h2>
         <p>Enter your administrator credentials to continue.</p>
       </div>
       <div id="login-error" class="form-error hidden"></div>
@@ -35,9 +35,12 @@
         </div>
         <div class="field login-field">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+          <div class="password-input-wrap">
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="login-password-toggle" aria-label="Show password" title="Show password"><i class="ti ti-eye"></i></button>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary login-submit" id="login-submit">Sign in</button>
+        <button type="submit" class="btn btn-primary login-submit" id="login-submit">Login</button>
       </form>
       <p class="login-form-footer">Only authorized campus administrators may access this area.</p>
     </div>

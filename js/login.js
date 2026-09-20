@@ -12,6 +12,16 @@ const auth = getAuth(app);
 const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
 const loginSubmit = document.getElementById("login-submit");
+const passwordInput = document.getElementById("password");
+const passwordToggle = document.getElementById("login-password-toggle");
+
+passwordToggle.addEventListener("click", () => {
+    const isVisible = passwordInput.type === "text";
+    passwordInput.type = isVisible ? "password" : "text";
+    passwordToggle.setAttribute("aria-label", `${isVisible ? "Show" : "Hide"} password`);
+    passwordToggle.title = `${isVisible ? "Show" : "Hide"} password`;
+    passwordToggle.innerHTML = `<i class="ti ti-eye${isVisible ? "" : "-off"}"></i>`;
+});
 
 console.log("login form:", loginForm);
 console.log("login button:", loginSubmit);
@@ -25,7 +35,7 @@ loginForm.addEventListener("submit", async (e) => {
     loginError.classList.add("hidden");
 
     loginSubmit.disabled = true;
-    loginSubmit.textContent = "Signing in...";
+    loginSubmit.textContent = "Loging in...";
 
     const email =
         document.getElementById("email").value.trim();

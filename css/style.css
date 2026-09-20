@@ -221,7 +221,8 @@ input, textarea { font-family: inherit; }
 .login-field:last-of-type { margin-bottom: 20px; }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 13px 14px;
@@ -233,23 +234,35 @@ input, textarea { font-family: inherit; }
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(28, 140, 124, 0.15);
   background: var(--white);
 }
 
+.field select option {
+  color: var(--ink-navy);
+  background: var(--white);
+}
+
+.password-input-wrap { position: relative; }
+.password-input-wrap input { width: 100%; padding-right: 44px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  border: 0;
+  padding: 6px;
+  color: var(--slate);
+  background: transparent;
+  line-height: 1;
+}
+.password-toggle:hover { color: var(--ink-navy); }
+
 .field-row { display: flex; gap: 12px; }
 .field-row .field { flex: 1; min-width: 0; }
-
-.view-detail-coords {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  font-size: 13px;
-  color: var(--slate);
-}
-.view-detail-coords span strong { color: var(--ink-navy); font-weight: 600; }
 
 .btn {
   font-size: 14px;
