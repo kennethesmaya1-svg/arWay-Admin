@@ -56,6 +56,7 @@ function normalizeBuilding(id, data) {
   return {
     id,
     name: String(data.name || data.title || "Unnamed building"),
+    destination_type: String(data.destination_type || "building"),
     building_node_id: String(data.building_node_id || ""),
     description: String(data.description || ""),
       image: String(data.imageUrl || data.image || ""),
@@ -132,6 +133,7 @@ function openFormDrawer(building) {
   document.getElementById("building-id").value = building ? building.id : "";
   document.getElementById("form-drawer-title").textContent = building ? "Edit building" : "Add building";
   document.getElementById("building-name").value = building?.name || "";
+  document.getElementById("destination-type").value = building?.destination_type || "building";
   document.getElementById("building-node-id").value = building?.building_node_id || "";
   document.getElementById("building-description").value = building?.description || "";
   facilityTags = [...(building?.facilities || [])];
@@ -178,6 +180,7 @@ async function saveBuilding(event) {
     const id = document.getElementById("building-id").value;
     const data = {
       name: document.getElementById("building-name").value.trim(),
+      destination_type: document.getElementById("destination-type").value,
       building_node_id: document.getElementById("building-node-id").value.trim(),
       description: document.getElementById("building-description").value.trim(),
       facilities: facilityTags,
