@@ -542,6 +542,31 @@ input, textarea { font-family: inherit; }
 
 /* ---------- Drawer (add / edit / view) ---------- */
 
+.view-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex;
+  gap: 12px;
+}
+
+.view-detail-row h5 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--slate);
+  font-weight: 500;
+}
+
+h5{
+  margin-bottom: 0;
+}
+
+.view-detail-value {
+  font-size: 14px;
+  color: var(--ink-navy);
+  font-weight: 500;
+  text-align: right;
+}
+
 .drawer-overlay {
   position: fixed;
   inset: 0;
@@ -687,17 +712,22 @@ input, textarea { font-family: inherit; }
   left: 0;
   right: 0;
   background: var(--ink-navy);
-  padding: 8px 0;
-  justify-content: center;
-  gap: 36px;
-  z-index: 40;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  justify-content: space-evenly;
+  gap: 0;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
 .mobile-nav button {
+  min-width: 52px;
+  min-height: 44px;
+  padding: 8px 12px;
   background: none;
   border: none;
   color: #C7CCDA;
   font-size: 20px;
+  touch-action: manipulation;
 }
 
 .mobile-nav button.active { color: var(--teal); }

@@ -66,7 +66,7 @@ loginForm.addEventListener("submit", async (e) => {
         console.error(error);
         console.error("Error code:", error.code);
 
-        let message = "Could not sign in.";
+        let message = "Could not login.";
 
         switch (error.code) {
 
@@ -102,7 +102,7 @@ loginForm.addEventListener("submit", async (e) => {
     } finally {
 
         loginSubmit.disabled = false;
-        loginSubmit.textContent = "Sign in";
+        loginSubmit.textContent = "Login";
 
     }
 });

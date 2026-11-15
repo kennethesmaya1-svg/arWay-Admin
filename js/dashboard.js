@@ -25,6 +25,7 @@ const UPLOAD_PRESET = "wgpse5lr";
 let buildings = [];
 let facilityTags = [];
 let pendingDeleteId = null;
+let activeDestinationType = "building";
 
 onAuthStateChanged(auth, (user) => {
   if (!user) {
@@ -67,15 +68,30 @@ function normalizeBuilding(id, data) {
 
 function renderBuildings() {
   const query = document.getElementById("search-input").value.trim().toLowerCase();
-  const visible = buildings.filter((building) => building.name.toLowerCase().includes(query));
-  document.getElementById("stat-total").textContent = buildings.length;
+  const destinations = buildings.filter((building) => building.destination_type === activeDestinationType);
+  const visible = destinations.filter((building) => building.name.toLowerCase().includes(query));
+  const destinationLabel = getDestinationLabel();
+  const destinationPluralLabel = activeDestinationType === "office_facility" ? "Office/Facilities" : "Buildings";
+  const searchLabel = activeDestinationType === "office_facility" ? "offices/facilities" : "buildings";
+  document.querySelectorAll(".sidebar-link[data-view], .mobile-nav [data-view]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.view === activeDestinationType);
+  });
+  document.querySelector(".topbar h1").textContent = destinationLabel;
+  document.getElementById("search-input").placeholder = `Search ${searchLabel}`;
+  const addButton = document.getElementById("add-building-btn");
+  addButton.innerHTML = `<i class="ti ti-plus"></i>Add ${destinationLabel}`;
+  addButton.classList.toggle("hidden", activeDestinationType !== "office_facility");
+  document.querySelector("#stat-total").previousElementSibling.textContent = destinationPluralLabel;
+  document.querySelector("#stat-facilities").previousElementSibling.textContent =
+    activeDestinationType === "office_facility" ? "Amenities" : "Facilities tagged";
+  document.getElementById("stat-total").textContent = destinations.length;
   document.getElementById("stat-facilities").textContent =
-    buildings.reduce((total, building) => total + building.facilities.length, 0);
-  const latest = Math.max(...buildings.map((building) => dateValue(building.updatedAt)), 0);
+    destinations.reduce((total, building) => total + building.facilities.length, 0);
+  const latest = Math.max(...destinations.map((building) => dateValue(building.updatedAt)), 0);
   document.getElementById("stat-updated").textContent = latest ? new Date(latest).toLocaleDateString() : "-";
 
   if (!visible.length) {
-    grid.innerHTML = `<div class="empty-state"><i class="ti ti-building" style="font-size:28px;"></i><p>${buildings.length ? "No buildings match your search." : "No buildings found in Firebase."}</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><i class="ti ti-building" style="font-size:28px;"></i><p>${destinations.length ? `No ${searchLabel} match your search.` : `No ${searchLabel} found in Firebase.`}</p></div>`;
     return;
   }
   grid.innerHTML = visible.map((building) => `
@@ -97,6 +113,16 @@ function renderBuildings() {
 
 function bindEvents() {
   document.getElementById("search-input").addEventListener("input", renderBuildings);
+  document.getElementById("destination-type").addEventListener("change", (event) => {
+    updateFacilityLabels(event.target.value);
+  });
+  document.querySelectorAll(".sidebar-link[data-view]").forEach((button) => {
+    button.addEventListener("click", () => selectDestination(button.dataset.view));
+  });
+  document.querySelector(".mobile-nav").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-view]");
+    if (button) selectDestination(button.dataset.view);
+  });
   document.getElementById("building-grid").addEventListener("click", (event) => {
     const button = event.target.closest("button[data-action]");
     if (!button) return;
@@ -117,6 +143,16 @@ function bindEvents() {
   document.getElementById("building-form").addEventListener("submit", saveBuilding);
   document.getElementById("delete-cancel-btn").addEventListener("click", closeDeleteModal);
   document.getElementById("delete-confirm-btn").addEventListener("click", deleteBuilding);
+  document.getElementById("delete-modal-overlay").addEventListener("click", (event) => {
+    if (event.target.id === "delete-modal-overlay") closeDeleteModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const deleteOverlay = document.getElementById("delete-modal-overlay");
+    const logoutOverlay = document.getElementById("logout-modal-overlay");
+    if (!deleteOverlay.classList.contains("hidden")) closeDeleteModal();
+    if (!logoutOverlay.classList.contains("hidden")) closeLogoutModal();
+  });
   document.getElementById("change-password-btn").addEventListener("click", openPasswordModal);
   document.getElementById("mobile-password-btn").addEventListener("click", openPasswordModal);
   document.getElementById("password-cancel-btn").addEventListener("click", closePasswordModal);
@@ -124,16 +160,29 @@ function bindEvents() {
   document.querySelectorAll(".password-toggle").forEach((button) => {
     button.addEventListener("click", () => togglePasswordVisibility(button));
   });
-  document.getElementById("logout-btn").addEventListener("click", logout);
-  document.getElementById("mobile-logout-btn").addEventListener("click", logout);
+  document.getElementById("logout-btn").addEventListener("click", openLogoutModal);
+  document.getElementById("mobile-logout-btn").addEventListener("click", openLogoutModal);
+  document.getElementById("logout-cancel-btn").addEventListener("click", closeLogoutModal);
+  document.getElementById("logout-confirm-btn").addEventListener("click", logout);
+  document.getElementById("logout-modal-overlay").addEventListener("click", (event) => {
+    if (event.target.id === "logout-modal-overlay") closeLogoutModal();
+  });
+}
+
+function selectDestination(type) {
+  activeDestinationType = type;
+  renderBuildings();
 }
 
 function openFormDrawer(building) {
   document.getElementById("building-form").reset();
   document.getElementById("building-id").value = building ? building.id : "";
-  document.getElementById("form-drawer-title").textContent = building ? "Edit building" : "Add building";
+  document.getElementById("form-drawer-title").textContent = `${building ? "Edit" : "Add"} ${getDestinationLabel(building?.destination_type || activeDestinationType)}`;
   document.getElementById("building-name").value = building?.name || "";
-  document.getElementById("destination-type").value = building?.destination_type || "building";
+  const destinationType = building?.destination_type || activeDestinationType;
+  document.getElementById("destination-type").value = destinationType;
+  document.getElementById("destination-type").disabled = !building && activeDestinationType === "office_facility";
+  updateFacilityLabels(document.getElementById("destination-type").value);
   document.getElementById("building-node-id").value = building?.building_node_id || "";
   document.getElementById("building-description").value = building?.description || "";
   facilityTags = [...(building?.facilities || [])];
@@ -208,15 +257,32 @@ function openViewDrawer(building) {
   document.getElementById("view-drawer-title").textContent = building.name;
   const image = document.getElementById("view-image");
   image.src = building.image || "";
+  document.getElementById("view-destination-type").textContent = building.destination_type === "office_facility" ? "Office/Facility" : "Building";
+  document.getElementById("view-building-node-id").textContent = building.building_node_id || "Not assigned";
   image.classList.toggle("hidden", !building.image);
   document.getElementById("view-description").textContent = building.description || "No description yet.";
+  document.getElementById("view-facilities-label").textContent = getFacilitiesLabel(building.destination_type);
   document.getElementById("view-facilities").innerHTML = building.facilities.map((facility) => `<span class="chip">${escapeHtml(facility)}</span>`).join("");
   document.getElementById("view-drawer-overlay").classList.remove("hidden");
 }
 function closeViewDrawer() { document.getElementById("view-drawer-overlay").classList.add("hidden"); }
+function getFacilitiesLabel(type) {
+  return type === "office_facility" ? "Amenities" : "Facilities";
+}
+function updateFacilityLabels(type) {
+  const isOfficeFacility = type === "office_facility";
+  document.getElementById("facility-label").textContent = getFacilitiesLabel(type);
+  document.getElementById("facility-hint").textContent = isOfficeFacility
+    ? "Optional - add any amenities this office/facility has."
+    : "Optional - add any facilities this building has.";
+}
+function getDestinationLabel(type = activeDestinationType) {
+  return type === "office_facility" ? "Office/Facility" : "Building";
+}
 function openDeleteModal(building) {
   pendingDeleteId = building.id;
-  document.getElementById("delete-modal-text").textContent = `"${building.name}" will be removed from the AR navigation app and can't be undone.`;
+  const destinationLabel = building.destination_type === "office_facility" ? "office/facility" : "building";
+  document.getElementById("delete-modal-text").textContent = `Are you sure you want to delete this ${destinationLabel}, "${building.name}"? It will be removed from the AR navigation app and cannot be undone.`;
   document.getElementById("delete-modal-overlay").classList.remove("hidden");
 }
 function closeDeleteModal() { pendingDeleteId = null; document.getElementById("delete-modal-overlay").classList.add("hidden"); }
@@ -234,6 +300,12 @@ function openPasswordModal() {
 }
 function closePasswordModal() {
   document.getElementById("password-modal-overlay").classList.add("hidden");
+}
+function openLogoutModal() {
+  document.getElementById("logout-modal-overlay").classList.remove("hidden");
+}
+function closeLogoutModal() {
+  document.getElementById("logout-modal-overlay").classList.add("hidden");
 }
 function togglePasswordVisibility(button) {
   const input = document.getElementById(button.dataset.passwordTarget);

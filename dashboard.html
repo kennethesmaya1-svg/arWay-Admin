@@ -17,24 +17,25 @@
       <div class="sidebar-sub">Admin console</div>
     </div>
     <nav class="sidebar-nav">
-      <button class="sidebar-link active" data-view="buildings"><i class="ti ti-building"></i>Buildings</button>
+      <button class="sidebar-link active" data-view="building"><i class="ti ti-building"></i>Building</button>
+      <button class="sidebar-link" data-view="office_facility"><i class="ti ti-building"></i>Office/Facility</button>
       <button class="sidebar-link" id="change-password-btn"><i class="ti ti-lock"></i>Change password</button>
+      <button class="sidebar-link" id="logout-btn"><i class="ti ti-logout"></i>Log out</button>
     </nav>
     <div class="sidebar-footer">
-      <button class="sidebar-link" id="logout-btn"><i class="ti ti-logout"></i>Log out</button>
     </div>
   </aside>
 
   <main class="main">
 
     <div class="topbar">
-      <h1>Buildings</h1>
+      <h1>Building</h1>
       <div class="topbar-actions">
         <div class="search-box">
           <i class="ti ti-search"></i>
           <input type="text" id="search-input" placeholder="Search buildings">
         </div>
-        <button class="btn btn-primary" id="add-building-btn"><i class="ti ti-plus"></i>Add building</button>
+        <button class="btn btn-primary hidden" id="add-building-btn"><i class="ti ti-plus"></i>Add Office/Facility</button>
       </div>
     </div>
 
@@ -59,10 +60,11 @@
 
   </main>
 
-  <nav class="mobile-nav">
-    <button class="active"><i class="ti ti-building"></i></button>
-    <button id="mobile-password-btn"><i class="ti ti-lock"></i></button>
-    <button id="mobile-logout-btn"><i class="ti ti-logout"></i></button>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button type="button" class="active" data-view="building" aria-label="Buildings" title="Buildings"><i class="ti ti-building"></i></button>
+    <button type="button" data-view="office_facility" aria-label="Office/Facility" title="Office/Facility"><i class="ti ti-building-community"></i></button>
+    <button type="button" id="mobile-password-btn" aria-label="Change password" title="Change password"><i class="ti ti-lock"></i></button>
+    <button type="button" id="mobile-logout-btn" aria-label="Log out" title="Log out"><i class="ti ti-logout"></i></button>
   </nav>
 
 </div>
@@ -80,7 +82,7 @@
       <input type="hidden" id="building-id" name="id">
 
       <div class="field">
-        <label for="building-name">Building name</label>
+        <label for="building-name">Name</label>
         <input type="text" id="building-name" name="name" required>
       </div>
 
@@ -93,43 +95,43 @@
       </div>
 
       <div class="field">
-        <label for="building-node-id">Building node ID</label>
+        <label for="building-node-id">Node ID</label>
         <select id="building-node-id" name="building_node_id">
           <option value="">Select a building node</option>
-          <option value="Node-01">Node-01(poi)</option>
-          <option value="Node-02">Node-02(poi)</option>
-          <option value="Node-03">Node-03(poi)</option>
-          <option value="Node-04">Node-04(poi)</option>
-          <option value="Node-05">Node-05(poi)</option>
-          <option value="Node-06">Node-06(poi)</option>
-          <option value="Node-07">Node-07(poi)</option>
-          <option value="Node-08">Node-08(poi)</option>
-          <option value="Node-09">Node-09(poi)</option>
-          <option value="Node-10">Node-10(poi)</option>
-          <option value="Node-11">Node-11(poi)</option>
-          <option value="Node-12">Node-12(poi)</option>
-          <option value="Node-13">Node-13(poi)</option>
-          <option value="Node-14">Node-14(waypoint)</option>
-          <option value="Node-15">Node-15(poi)</option>
-          <option value="Node-16">Node-16(poi)</option>
-          <option value="Node-17">Node-17(poi)</option>
-          <option value="Node-18">Node-18(waypoint)</option>
-          <option value="Node-19">Node-19(poi)</option>
-          <option value="Node-20">Node-20(waypoint)</option>
-          <option value="Node-21">Node-21(poi)</option>
-          <option value="Node-22">Node-22(poi)</option>
-          <option value="Node-23">Node-23(poi)</option>
-          <option value="Node-24">Node-24(poi)</option>
-          <option value="Node-25">Node-25(waypoint)</option>
-          <option value="Node-26">Node-26(poi)</option>
-          <option value="Node-27">Node-27(waypoint)</option>
-          <option value="Node-28">Node-28(waypoint)</option>
-          <option value="Node-29">Node-29(poi)</option>
-          <option value="Node-30">Node-30(poi)</option>
-          <option value="Node-31">Node-31(poi)</option>
-          <option value="Node-32">Node-32(poi)</option>
-          <option value="Node-33">Node-33(waypoint)</option>
-          <option value="Node-34">Node-34(waypoint)</option>
+          <option value="Node-01">Node-01</option>
+          <option value="Node-02">Node-02</option>
+          <option value="Node-03">Node-03</option>
+          <option value="Node-04">Node-04</option>
+          <option value="Node-05">Node-05</option>
+          <option value="Node-06">Node-06</option>
+          <option value="Node-07">Node-07</option>
+          <option value="Node-08">Node-08</option>
+          <option value="Node-09">Node-09</option>
+          <option value="Node-10">Node-10</option>
+          <option value="Node-11">Node-11</option>
+          <option value="Node-12">Node-12</option>
+          <option value="Node-13">Node-13</option>
+          <option value="Node-14">Node-14</option>
+          <option value="Node-15">Node-15</option>
+          <option value="Node-16">Node-16</option>
+          <option value="Node-17">Node-17</option>
+          <option value="Node-18">Node-18</option>
+          <option value="Node-19">Node-19</option>
+          <option value="Node-20">Node-20</option>
+          <option value="Node-21">Node-21</option>
+          <option value="Node-22">Node-22</option>
+          <option value="Node-23">Node-23</option>
+          <option value="Node-24">Node-24</option>
+          <option value="Node-25">Node-25</option>
+          <option value="Node-26">Node-26</option>
+          <option value="Node-27">Node-27</option>
+          <option value="Node-28">Node-28</option>
+          <option value="Node-29">Node-29</option>
+          <option value="Node-30">Node-30</option>
+          <option value="Node-31">Node-31</option>
+          <option value="Node-32">Node-32</option>
+          <option value="Node-33">Node-33</option>
+          <option value="Node-34">Node-34</option>
         </select>
       </div>
 
@@ -139,7 +141,7 @@
       </div>
 
       <div class="field">
-        <label>Building image</label>
+        <label>Image</label>
         <label class="image-drop" id="image-drop">
           <img id="image-preview" class="hidden" alt="">
           <span id="image-drop-label"><i class="ti ti-upload"></i> Click to upload an image</span>
@@ -148,13 +150,13 @@
       </div>
 
       <div class="field">
-        <label for="facility-input">Facilities</label>
+        <label for="facility-input" id="facility-label">Facilities</label>
         <div class="facility-input-row">
           <input type="text" id="facility-input" placeholder="e.g. Wi-Fi, then press Enter">
           <button type="button" class="btn btn-ghost" id="facility-add-btn"><i class="ti ti-plus"></i></button>
         </div>
         <div class="chip-row" id="facility-chip-row"></div>
-        <div class="facility-hint">Optional - add any facilities this building has.</div>
+        <div class="facility-hint" id="facility-hint">Optional - add any facilities this building has.</div>
         <input type="hidden" id="facilities-json" name="facilities" value="[]">
       </div>
     </form>
@@ -174,7 +176,17 @@
     </div>
     <div class="drawer-body">
       <img class="view-detail-image" id="view-image" alt="">
+       <div class="view-detail-row">
+        <h5>Type:</h5>
+        <div class="view-detail-value" id="view-destination-type">-</div>
+      </div>
+      <div class="view-detail-row">
+        <h5>Node ID:</h5>
+        <div class="view-detail-value" id="view-building-node-id">-</div>
+      </div>
+      <h5>Description</h5>
       <p class="view-detail-desc" id="view-description"></p>
+      <h5 id="view-facilities-label">Facilities</h5>
       <div class="chip-row" id="view-facilities"></div>
     </div>
   </div>
@@ -186,8 +198,20 @@
     <h3>Delete this building?</h3>
     <p id="delete-modal-text">This removes it from the AR navigation app and can't be undone.</p>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="delete-cancel-btn">Cancel</button>
-      <button class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+      <button type="button" class="btn btn-ghost" id="delete-cancel-btn">Cancel</button>
+      <button type="button" class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Logout confirmation -->
+<div class="modal-overlay hidden" id="logout-modal-overlay">
+  <div class="modal-card">
+    <h3>Log out?</h3>
+    <p>Are you sure you want to log out?</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="logout-cancel-btn">Cancel</button>
+      <button type="button" class="btn btn-danger" id="logout-confirm-btn">Log out</button>
     </div>
   </div>
 </div>
