@@ -743,6 +743,7 @@ h5{
   .mobile-nav { display: flex; }
   .main { padding: 18px 16px 76px; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .drawer-overlay { bottom: calc(60px + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 640px) {
